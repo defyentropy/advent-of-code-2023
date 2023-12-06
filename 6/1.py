@@ -9,25 +9,11 @@ def main():
 
     margin = 1
     for i in range(len(times)):
-        roots = solve_quadratic(-1, times[i], -dists[i])
-        time_bounds = (ceil_all(roots[0]), floor_all(roots[1]))
+        roots = solve_quadratic(-1, times[i], -dists[i] - 1)
+        time_bounds = (ceil(roots[0]), floor(roots[1]))
         margin *= time_bounds[1] - time_bounds[0] + 1
 
     print(margin)
-
-
-def ceil_all(n):
-    if n % 1 == 0:
-        return int(n + 1)
-    else:
-        return ceil(n)
-
-
-def floor_all(n):
-    if n % 1 == 0:
-        return int(n - 1)
-    else:
-        return floor(n)
 
 
 def solve_quadratic(a, b, c):
