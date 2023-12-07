@@ -11,10 +11,10 @@ def main():
     with open("input.txt", "r") as input:
         line = input.readline()
         while line:
-            turns.append([[t[0], int(t[1])] for t in [line.strip("\n").split(" ")]][0])
+            turns.append([(t[0], int(t[1])) for t in [line.strip("\n").split(" ")]][0])
             line = input.readline()
 
-    turns.sort(key=cmp_to_key(compare_hands))
+    turns.sort(key=cmp_to_key(lambda t1, t2: compare_hands(t1[0], t2[0])))
 
     winnings = 0
     for i in range(len(turns)):
@@ -23,54 +23,52 @@ def main():
     print(winnings)
 
 
-def get_hand_type(turn):
-    hand = turn[0]
+def get_shape(hand):
+    return list(
+        zip(
+            *sorted(
+                list(map(list, set([(c, len(findall(c, hand))) for c in hand]))),
+                key=lambda c: c[1],
+            )
+        )
+    )[1]
 
+
+def get_hand_type(hand):
     if hand in HAND_TYPES:
         return HAND_TYPES[hand]
 
-    cards = set(hand)
-    hand_type = None
+    shape = get_shape(hand)
 
-    if len(cards) == 1:
-        hand_type = 6  # five of a kind
-    elif len(cards) == 2:
-        shape = sorted([len(findall(c, hand)) for c in cards])
-
-        if shape == [1, 4]:
-            hand_type = 5  # four of a kind
-        else:
-            hand_type = 4  # full house
-    elif len(cards) == 3:
-        shape = sorted([len(findall(c, hand)) for c in cards])
-
-        if shape == [1, 1, 3]:
-            hand_type = 3  # 3 of a kind
-        else:
-            hand_type = 2  # two pair
-    elif len(cards) == 4:
-        hand_type = 1  # one pair
-    else:
-        hand_type = 0  # high card
+    match shape:
+        case (5,):
+            hand_type = 6
+        case (1, 4):
+            hand_type = 5
+        case (2, 3):
+            hand_type = 4
+        case (1, 1, 3):
+            hand_type = 3
+        case (1, 2, 2):
+            hand_type = 2
+        case (1, 1, 1, 2):
+            hand_type = 1
+        case (1, 1, 1, 1, 1):
+            hand_type = 0
 
     HAND_TYPES[hand] = hand_type
     return hand_type
 
 
-def compare_hands(turn1, turn2):
-    hand_type1 = get_hand_type(turn1)
-    hand_type2 = get_hand_type(turn2)
-
-    if hand_type1 != hand_type2:
-        return hand_type1 - hand_type2
+def compare_hands(hand1, hand2):
+    if get_hand_type(hand1) != get_hand_type(hand2):
+        return get_hand_type(hand1) - get_hand_type(hand2)
 
     for i in range(5):
-        if turn1[0][i] == turn2[0][i]:
+        if hand1[i] == hand2[i]:
             continue
-        elif CARD_RANKS.index(turn1[0][i]) > CARD_RANKS.index(turn2[0][i]):
-            return 1
         else:
-            return -1
+            return CARD_RANKS.index(hand1[i]) - CARD_RANKS.index(hand2[i])
 
 
 if __name__ == "__main__":
