@@ -36,9 +36,8 @@ def main():
     for line in lines:
         possible_arrangements = count_matches(*line)
         sum += possible_arrangements
-    # print(sum)
+    print(sum)
 
 
 if __name__ == "__main__":
-    for i in range(1000):
-        main()
+    main()
