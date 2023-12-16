@@ -1,5 +1,5 @@
 def main():
-    rows = [list(line.strip("\n")) for line in open("input.txt").readlines()]
+    rows = [list(line.strip("\n")) for line in open("test.txt").readlines()]
 
     def north():
         shift_v(rows, "N")
@@ -24,6 +24,11 @@ def main():
     spin_cycle()
     while stringify(rows) not in cycles:
         cycles.append(stringify(rows))
+
+        for row in rows:
+            print("".join(row))
+        print()
+
         spin_cycle()
 
     loop_length = len(cycles) - cycles.index(stringify(rows))
